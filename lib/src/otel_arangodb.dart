@@ -1,13 +1,13 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_arangodb_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_arangodb';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class ArangodbResult {
   const ArangodbResult({
@@ -75,61 +75,61 @@ Future<T> tracedArangodb<T>({
   final span = _tracer().startSpan(
     'arangodb $operation${collection != null ? ' $collection' : ''}',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.resultsCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'arangodb.results_count',
           r.result!.resultsCount!,
         ));
       }
       if (r.result!.executionTimeMs != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'arangodb.execution_time_ms',
           r.result!.executionTimeMs!,
         ));
       }
       if (r.result!.scannedFull != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'arangodb.scanned_full',
           r.result!.scannedFull!,
         ));
       }
       if (r.result!.scannedIndex != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'arangodb.scanned_index',
           r.result!.scannedIndex!,
         ));
       }
       if (r.result!.writesExecuted != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'arangodb.writes_executed',
           r.result!.writesExecuted!,
         ));
       }
       if (r.result!.filtered != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'arangodb.filtered',
           r.result!.filtered!,
         ));
       }
       if (r.result!.cached != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'arangodb.cached',
           r.result!.cached!,
         ));
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
